@@ -16,7 +16,7 @@ import lombok.extern.log4j.Log4j;
 
 
 @Log4j
-@Controller
+@Component
 public class ChattingHandler extends TextWebSocketHandler{
 	
 	private List<WebSocketSession> sessionList = new ArrayList<WebSocketSession>();
@@ -25,19 +25,19 @@ public class ChattingHandler extends TextWebSocketHandler{
 	public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 		super.afterConnectionEstablished(session);
 		sessionList.add(session);
-		
-		log.info(session.getPrincipal().getName() + "님이 입장하셨습니다.");
+		log.info(session);
 		
 	}
 
 	@Override
-	public void handleMessage(WebSocketSession session, WebSocketMessage<?> message) throws Exception {
-		super.handleMessage(session, message);
+	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 		
-		for (WebSocketSession a : sessionList) {
-			a.sendMessage(new TextMessage(session.getPrincipal().getName()+" : "+message));
+		log.info("#ChattingHandler, handleMessage");
+		log.info(message.getPayload().toString());
+		
+		for(WebSocketSession s : sessionList) {
+			s.sendMessage(new TextMessage(message.getPayload().toString()));
 		}
-		
 	}
 
 	@Override
@@ -45,8 +45,7 @@ public class ChattingHandler extends TextWebSocketHandler{
 		super.afterConnectionClosed(session, status);
 		
 		sessionList.remove(session);
-		
-		log.info(session.getPrincipal().getName() + "님이 퇴장하셨습니다.");
+		log.info("해제");
 	}
 
 	
