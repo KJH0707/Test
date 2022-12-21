@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.CloseStatus;
@@ -27,16 +29,24 @@ public class ChattingHandler extends TextWebSocketHandler{
 		sessionList.add(session);
 		log.info(session);
 		
+		String id = (String)session.getAttributes().get("id");
+		
+		for (WebSocketSession s : sessionList) {
+			s.sendMessage(new TextMessage(id+"님이 입장하셨습니다."));
+		}
+		
+		
 	}
-
+	
 	@Override
 	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 		
 		log.info("#ChattingHandler, handleMessage");
 		log.info(message.getPayload().toString());
+		String id = (String)session.getAttributes().get("id");
 		
 		for(WebSocketSession s : sessionList) {
-			s.sendMessage(new TextMessage(message.getPayload().toString()));
+			s.sendMessage(new TextMessage(id+" : "+message.getPayload().toString()));
 		}
 	}
 
@@ -44,8 +54,18 @@ public class ChattingHandler extends TextWebSocketHandler{
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
 		super.afterConnectionClosed(session, status);
 		
+		String id = (String)session.getAttributes().get("id");
+		
+		for (WebSocketSession s : sessionList) {
+			if (!(id.equals(s.getAttributes().get("id")))) {
+				s.sendMessage(new TextMessage(id+"님이 퇴장하셨습니다."));
+			}
+		}
+		
+		
 		sessionList.remove(session);
-		log.info("해제");
+		
+		log.info(id+" 퇴장");
 	}
 
 	

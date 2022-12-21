@@ -18,8 +18,6 @@ $(document).ready(function(){
 });
 	var sock = new SockJS('http://localhost:8080/chatting');
 	sock.onmessage = onMessage;
-	sock.onclose = onClose;
-	sock.onopen = onOpen;
 	
 	function sendMessage() {
 		sock.send($("#msg").val());
@@ -31,17 +29,15 @@ $(document).ready(function(){
 		var sessionId = null; //데이터를 보낸 사람
 		var message = null;
 		
-		var cur_session = '${userid}'; //현재 세션에 로그인 한 사람
+		var cur_session = '${id}'; //현재 세션에 로그인 한 사람
 		console.log("cur_session : " + cur_session);
 		
-		message = data.toString();
-		
 	    //로그인 한 클라이언트와 타 클라이언트를 분류하기 위함
-		if('${userid}' == cur_session){
+		if(sessionId == cur_session){
 			
 			var str = "<div class='col-6'>";
 			str += "<div class='alert alert-secondary'>";
-			str += "<b>" + "${userid}" + " : " + message + "</b>";
+			str += "<b>"+data+"</b>";
 			str += "</div></div>";
 			
 			$("#msgArea").append(str);
@@ -50,34 +46,17 @@ $(document).ready(function(){
 			
 			var str = "<div class='col-6'>";
 			str += "<div class='alert alert-warning'>";
-			str += "<b>상대방 : " + message + "</b>";
+			str += "<b>"+data+"</b>";
 			str += "</div></div>";
 			
 			$("#msgArea").append(str);
 		}
 		
 	}
-	//채팅창에서 나갔을 때
-	function onClose(evt) {
-		
-		var user = '${userid}';
-		var str = user + " 님이 퇴장하셨습니다.";
-		
-		$("#msgArea").append(str);
-	}
-	//채팅창에 들어왔을 때
-	function onOpen(evt) {
-		
-		var user = '${userid}';
-		var str = user + "님이 입장하셨습니다.";
-		
-		$("#msgArea").append(str);
-	}
 
 </script>
-
-
 </head>
+
 <body>
 	<div class="container">
 	<div class="col-6">
