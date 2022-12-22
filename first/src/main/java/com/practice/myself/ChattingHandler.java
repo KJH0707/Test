@@ -48,6 +48,7 @@ public class ChattingHandler extends TextWebSocketHandler{
 		for(WebSocketSession s : sessionList) {
 			s.sendMessage(new TextMessage(id+" : "+message.getPayload().toString()));
 		}
+		
 	}
 
 	@Override

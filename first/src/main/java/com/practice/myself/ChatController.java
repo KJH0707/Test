@@ -1,5 +1,6 @@
 package com.practice.myself;
 
+import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,9 @@ import lombok.extern.log4j.Log4j;
 @Controller
 @Log4j
 public class ChatController {
+	
+	@Inject
+	practiceService service;
 	
 	@GetMapping("/chat")
 	public void chat() {
@@ -34,5 +38,10 @@ public class ChatController {
 		session.setAttribute("id", vo.getId());
 		
 		return "redirect:main";
+	}
+	
+	@GetMapping("/test")
+	public void test() {
+		service.test();
 	}
 }
