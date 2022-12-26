@@ -32,7 +32,7 @@ public class ChattingHandler extends TextWebSocketHandler {
 		
 		String id = (String)session.getAttributes().get("id");
 		
-		chatMap.put("buyId", id );
+		chatMap.put("buyId", id);
 		
 		
 		switch (mapReceive.get("cmd")) {
@@ -40,7 +40,6 @@ public class ChattingHandler extends TextWebSocketHandler {
 		// CLIENT 입장
 		case "CMD_ENTER":
 			// 세션 리스트에 저장
-			chatMap.put("bang_id", mapReceive.get("bang_id"));
 			chatMap.put("sellId", mapReceive.get("sellId"));
 			
 			Map<String, Object> map = new HashMap<String, Object>();
@@ -65,7 +64,7 @@ public class ChattingHandler extends TextWebSocketHandler {
 //					sess.sendMessage(new TextMessage(jsonStr));
 //				}
 //			}
-//			break;
+			break;
 			
 			
 			
@@ -116,20 +115,20 @@ public class ChattingHandler extends TextWebSocketHandler {
 		}
 		
 		// 같은 채팅방에 퇴장 메세지 전송 
-		for (int i = 0; i < sessionList.size(); i++) {
-			Map<String, Object> mapSessionList = sessionList.get(i);
-			String bang_id = (String) mapSessionList.get("bang_id");
-			WebSocketSession sess = (WebSocketSession) mapSessionList.get("session");
-
-			if (bang_id.equals(now_bang_id)) {
-				Map<String, String> mapToSend = new HashMap<String, String>();
-				mapToSend.put("bang_id", bang_id);
-				mapToSend.put("cmd", "CMD_EXIT");
-				mapToSend.put("msg", session.getId() + "님이 퇴장 했습니다.");
-
-				String jsonStr = objectMapper.writeValueAsString(mapToSend);
-				sess.sendMessage(new TextMessage(jsonStr));
-			}
-		}
+//		for (int i = 0; i < sessionList.size(); i++) {
+//			Map<String, Object> mapSessionList = sessionList.get(i);
+//			String bang_id = (String) mapSessionList.get("bang_id");
+//			WebSocketSession sess = (WebSocketSession) mapSessionList.get("session");
+//
+//			if (bang_id.equals(now_bang_id)) {
+//				Map<String, String> mapToSend = new HashMap<String, String>();
+//				mapToSend.put("bang_id", bang_id);
+//				mapToSend.put("cmd", "CMD_EXIT");
+//				mapToSend.put("msg", session.getId() + "님이 퇴장 했습니다.");
+//
+//				String jsonStr = objectMapper.writeValueAsString(mapToSend);
+//				sess.sendMessage(new TextMessage(jsonStr));
+//			}
+//		}
 	}
 }
