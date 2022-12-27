@@ -4,6 +4,11 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<style>
+	body {
+        margin: 0;
+      }
+    </style>
 	<title>웹소켓 채팅</title>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.js"></script>
@@ -18,24 +23,34 @@
          folder instead of downloading all of them to reduce the load. -->
     <link href="/resources/dist/css/skins/_all-skins.min.css" rel="stylesheet" type="text/css"/>
 	<script type="text/javascript">
+		
+		var cur_session='${id}';
+		
 		var webSocket = {
 			init: function(param) {
 				this._url = param.url;
 				this._initSocket();
 			},
 			sendChat: function() {
-				this._sendMessage('${param.goods_no}','${param.sellid}','${param.bang_id}', 'CMD_MSG_SEND', $('#message').val());
+				this._sendMessage('${id}','${param.goods_no}','${param.sellid}','${param.bang_id}', 'CMD_MSG_SEND', $('#message').val());
 				$('#message').val('');
 			},
 			sendEnter: function() {
-				this._sendMessage('${param.goods_no}','${param.sellid}','${param.bang_id}', 'CMD_ENTER', $('#message').val());
+				this._sendMessage('${id}','${param.goods_no}','${param.sellid}','${param.bang_id}', 'CMD_ENTER', $('#message').val());
 				$('#message').val('');
 			},
 			receiveMessage: function(msgData) {
-
+			
 				// 정의된 CMD 코드에 따라서 분기 처리
-				if(msgData.cmd == 'CMD_MSG_SEND') {					
-					$('#divChatData').append("<div class='direct-chat-msg'><div class='direct-chat-info clearfix'><span class='direct-chat-name pull-left'>Alexander Pierce</span><span class='direct-chat-timestamp pull-right'>23 Jan 2:00 pm</span></div><img class='direct-chat-img' src='../dist/img/user1-128x128.jpg' alt='Message User Image'><div class='direct-chat-text'>"+msgData.msg+"</div></div>");
+				if(msgData.cmd == 'CMD_MSG_SEND') {	
+					if(msgData.send_id != cur_session) {
+						$('#divChatData').append("<div class='direct-chat-msg'><div class='direct-chat-info clearfix'><span class='direct-chat-name pull-left'>Alexander Pierce</span><span class='direct-chat-timestamp pull-right'>23 Jan 2:00 pm</span></div><div class='direct-chat-text'>"+msgData.msg+"</div></div>");
+						$('#divChatData').scrollTop($('#divChatData')[0].scrollHeight);
+					}
+					else {
+						$('#divChatData').append("<div class='direct-chat-msg right'><div class='direct-chat-info clearfix'><span class='direct-chat-name pull-right'>Sarah Bullock</span><span class='direct-chat-timestamp pull-left'>23 Jan 2:05 pm</span></div><img class='direct-chat-img' src='../dist/img/user3-128x128.jpg' alt='Message User Image'><div class='direct-chat-text'>"+msgData.msg+"</div></div>");
+						$('#divChatData').scrollTop($('#divChatData')[0].scrollHeight);
+					}
 				}
 				// 입장
 				else if(msgData.cmd == 'CMD_ENTER') {
@@ -65,8 +80,9 @@
 					webSocket.closeMessage(JSON.parse(evt.data));
 				}
 			},
-			_sendMessage: function(goods_no ,sellid ,bang_id ,cmd ,msg) {
+			_sendMessage: function(send_id, goods_no ,sellid ,bang_id ,cmd ,msg) {
 				var msgData = {
+						send_id : send_id,
 						goods_no : goods_no,
 						sell_id : sellid,
 						bang_id : bang_id,
@@ -86,11 +102,10 @@
 </head>
 <body>
 
-<div class="col-md-3">
 
 <div class="box box-success direct-chat direct-chat-success">
 <div class="box-header with-border">
-<h3 class="box-title">Direct Chat</h3>
+<h3 class="box-title">Panda Chat</h3>
 <div class="box-tools pull-right">
 <span data-toggle="tooltip" title="" class="badge bg-green" data-original-title="3 New Messages">3</span>
 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
@@ -104,24 +119,8 @@
 
 <div class="box-body">
 
-<div class="direct-chat-messages">
+<div style="height:81vh;" class="direct-chat-messages">
 <div id="divChatData"></div>
-
-
-
-<div class="direct-chat-msg right">
-<div class="direct-chat-info clearfix">
-<span class="direct-chat-name pull-right">Sarah Bullock</span>
-<span class="direct-chat-timestamp pull-left">23 Jan 2:05 pm</span>
-</div>
-
-<img class="direct-chat-img" src="../dist/img/user3-128x128.jpg" alt="Message User Image">
-<div class="direct-chat-text">
-You better believe it!
-</div>
-
-</div>
-
 </div>
 
 
@@ -148,27 +147,17 @@ Count Dracula
 </div>
 
 <div class="box-footer">
-<form action="#" method="post">
 <div class="input-group">
-<input type="text" name="message" placeholder="Type Message ..." class="form-control">
+<input type="text" id="message" size="110" class="form-control" onkeypress="if(event.keyCode==13){webSocket.sendChat();}">
 <span class="input-group-btn">
-<button type="button" class="btn btn-success btn-flat" onclick="webSocket.sendChat()" >채팅 전송</button>
+<button type="button" id="btnSend" class="btn btn-success btn-flat" onclick="webSocket.sendChat()" >채팅 전송</button>
 </span>
 </div>
-</form>
 </div>
 
 </div>
 
-</div>
 
 
-<!-- 	<div style="width: 800px; height: 700px; padding: 10px; border: solid 1px #e1e3e9;"> -->
-<!-- 		<div id="divChatData"></div> -->
-<!-- 	</div> -->
-	<div style="width: 100%; height: 10%; padding: 10px;">
-		<input type="text" id="message" size="110" onkeypress="if(event.keyCode==13){webSocket.sendChat();}" />
-		<input type="button" id="btnSend" value="" />
-	</div>
 </body>
 </html>

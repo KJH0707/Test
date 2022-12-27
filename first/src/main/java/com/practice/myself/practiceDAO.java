@@ -16,4 +16,11 @@ public class practiceDAO {
 	public void testDB() {
 		sqlSession.insert(mapper+".test");
 	}
+	
+	public String getRoom() {
+		ChatVO vo = new ChatVO();
+		vo.setBuyer_id("ddd");
+		vo.setSeller_id("d12");
+		return sqlSession.selectOne(mapper+".getRoom",vo);
+	}
 }

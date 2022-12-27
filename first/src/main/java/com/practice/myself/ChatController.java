@@ -20,8 +20,16 @@ public class ChatController {
 	practiceService service;
 	
 	@GetMapping("/chat")
-	public void chat() {
+	public void chat(Model model) {
+		String bang_id = service.getRoom();
 		
+		if (bang_id==null) {
+            for (int i = 0; i < 15; i++) {
+                char upperCh = (char)((int)(Math.random()*25) + 97);
+                bang_id += upperCh;
+            }
+		}
+		model.addAttribute("bang_id",bang_id);
 	}
 	
 	@GetMapping("/login")

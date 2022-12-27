@@ -13,4 +13,8 @@ public class practiceService {
 	public void test() {
 		dao.testDB();
 	}
+	
+	public String getRoom() {
+		return dao.getRoom();
+	}
 }

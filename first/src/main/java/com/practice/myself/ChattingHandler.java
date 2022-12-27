@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -15,10 +17,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 public class ChattingHandler extends TextWebSocketHandler {
-
+	
 	// (<"bang_id", 방ID>, <"session", 세션>) - (<"bang_id", 방ID>, <"session", 세션>) - (<"bang_id", 방ID>, <"session", 세션>) 형태 
 	private List<Map<String, Object>> sessionList = new ArrayList<Map<String, Object>>();
 	
+	private static final Logger logger = LoggerFactory.getLogger(ChattingHandler.class);
 	// 클라이언트가 서버로 메세지 전송 처리
 	@Override
 	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
@@ -81,6 +84,7 @@ public class ChattingHandler extends TextWebSocketHandler {
 
 				if (bang_id.equals(mapReceive.get("bang_id"))) {
 					Map<String, String> mapToSend = new HashMap<String, String>();
+					mapToSend.put("send_id",id);
 					mapToSend.put("bang_id", bang_id);
 					mapToSend.put("cmd", "CMD_MSG_SEND");
 					mapToSend.put("msg", id + " : " + mapReceive.get("msg"));
@@ -88,6 +92,7 @@ public class ChattingHandler extends TextWebSocketHandler {
 					String jsonStr = objectMapper.writeValueAsString(mapToSend);
 					sess.sendMessage(new TextMessage(jsonStr));
 					chatMap.put("msg", jsonStr);
+					logger.info(chatMap.toString());
 				}
 			}
 			break;
