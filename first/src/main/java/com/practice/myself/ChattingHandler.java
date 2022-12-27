@@ -1,9 +1,13 @@
 package com.practice.myself;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,11 +19,16 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+
 @Component
 public class ChattingHandler extends TextWebSocketHandler {
 	
 	// (<"bang_id", 방ID>, <"session", 세션>) - (<"bang_id", 방ID>, <"session", 세션>) - (<"bang_id", 방ID>, <"session", 세션>) 형태 
 	private List<Map<String, Object>> sessionList = new ArrayList<Map<String, Object>>();
+	
+	
+	@Inject
+	practiceService service;
 	
 	private static final Logger logger = LoggerFactory.getLogger(ChattingHandler.class);
 	// 클라이언트가 서버로 메세지 전송 처리
@@ -31,12 +40,10 @@ public class ChattingHandler extends TextWebSocketHandler {
 		// JSON --> Map으로 변환
 		ObjectMapper objectMapper = new ObjectMapper();
 		Map<String, String> mapReceive = objectMapper.readValue(message.getPayload(), Map.class);
-		Map<String, Object> chatMap = new HashMap<String, Object>();
+		
 		
 		String id = (String)session.getAttributes().get("id");
 		
-		chatMap.put("buyId", id);
-		chatMap.put("sellId", mapReceive.get("sellId"));
 		
 		switch (mapReceive.get("cmd")) {
 		
@@ -44,14 +51,25 @@ public class ChattingHandler extends TextWebSocketHandler {
 		case "CMD_ENTER":
 			// 세션 리스트에 저장
 			
-			
-			
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("bang_id", mapReceive.get("bang_id"));
 			
 			map.put("session", session);
 			sessionList.add(map);
+			map.put("id1", id);
+			map.put("id2", mapReceive.get("sell_id"));
 			
+			String bang_id = service.getRoom(map);
+			logger.info(bang_id);
+			
+			if (bang_id!=null) {
+				List msgs = service.getMsg(bang_id);
+				logger.info(msgs.toString());
+				for (int i=0;i<msgs.size();i++) {
+					String msg = (String)msgs.get(i);
+					session.sendMessage(new TextMessage(msg));
+				}
+			}
 //			 같은 채팅방에 입장 메세지 전송
 //			for (int i = 0; i < sessionList.size(); i++) {
 //				Map<String, Object> mapSessionList = sessionList.get(i);
@@ -77,28 +95,43 @@ public class ChattingHandler extends TextWebSocketHandler {
 		// CLIENT 메세지
 		case "CMD_MSG_SEND":
 			// 같은 채팅방에 메세지 전송
+			
+//			vo.setId1(id);
+//			vo.setId2(mapReceive.get("sellId"));
+//			vo.setBang_id(mapReceive.get("bang_id"));
+//			vo.setGoods_no(Integer.parseInt(mapReceive.get("goods_no")));
+			
 			for (int i = 0; i < sessionList.size(); i++) {
 				Map<String, Object> mapSessionList = sessionList.get(i);
-				String bang_id = (String) mapSessionList.get("bang_id");
+				bang_id = (String) mapSessionList.get("bang_id");
 				WebSocketSession sess = (WebSocketSession) mapSessionList.get("session");
-
+				
 				if (bang_id.equals(mapReceive.get("bang_id"))) {
 					Map<String, String> mapToSend = new HashMap<String, String>();
 					mapToSend.put("send_id",id);
 					mapToSend.put("bang_id", bang_id);
 					mapToSend.put("cmd", "CMD_MSG_SEND");
 					mapToSend.put("msg", id + " : " + mapReceive.get("msg"));
-
+					
+					
 					String jsonStr = objectMapper.writeValueAsString(mapToSend);
 					sess.sendMessage(new TextMessage(jsonStr));
-					chatMap.put("msg", jsonStr);
-					logger.info(chatMap.toString());
+//					vo.setMessage(jsonStr);
+					Map<String, Object> chatMap = new HashMap<String, Object>();
+					chatMap.put("id1", id);
+					chatMap.put("id2", mapReceive.get("sell_id"));
+					chatMap.put("bang_id", mapReceive.get("bang_id"));
+					chatMap.put("goods_no", Integer.parseInt(mapReceive.get("goods_no")));
+					chatMap.put("message", jsonStr);
+					service.recordMsg(chatMap);
+					
+					logger.info(jsonStr);
 				}
 			}
 			break;
 		}
 	}
-
+	
 	// 클라이언트가 연결을 끊음 처리
 	@Override
 	public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {

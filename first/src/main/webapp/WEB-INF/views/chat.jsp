@@ -32,11 +32,11 @@
 				this._initSocket();
 			},
 			sendChat: function() {
-				this._sendMessage('${id}','${param.goods_no}','${param.sellid}','${param.bang_id}', 'CMD_MSG_SEND', $('#message').val());
+				this._sendMessage('${id}','12','sadf','${bang_id}', 'CMD_MSG_SEND', $('#message').val());
 				$('#message').val('');
 			},
 			sendEnter: function() {
-				this._sendMessage('${id}','${param.goods_no}','${param.sellid}','${param.bang_id}', 'CMD_ENTER', $('#message').val());
+				this._sendMessage('${id}','12','sadf','${bang_id}', 'CMD_ENTER', $('#message').val());
 				$('#message').val('');
 			},
 			receiveMessage: function(msgData) {
@@ -45,11 +45,11 @@
 				if(msgData.cmd == 'CMD_MSG_SEND') {	
 					if(msgData.send_id != cur_session) {
 						$('#divChatData').append("<div class='direct-chat-msg'><div class='direct-chat-info clearfix'><span class='direct-chat-name pull-left'>Alexander Pierce</span><span class='direct-chat-timestamp pull-right'>23 Jan 2:00 pm</span></div><div class='direct-chat-text'>"+msgData.msg+"</div></div>");
-						$('#divChatData').scrollTop($('#divChatData')[0].scrollHeight);
+// 						$('#divChatData').scrollTop($('#divChatData')[0].scrollHeight);
 					}
 					else {
 						$('#divChatData').append("<div class='direct-chat-msg right'><div class='direct-chat-info clearfix'><span class='direct-chat-name pull-right'>Sarah Bullock</span><span class='direct-chat-timestamp pull-left'>23 Jan 2:05 pm</span></div><img class='direct-chat-img' src='../dist/img/user3-128x128.jpg' alt='Message User Image'><div class='direct-chat-text'>"+msgData.msg+"</div></div>");
-						$('#divChatData').scrollTop($('#divChatData')[0].scrollHeight);
+// 						$('#divChatData').scrollTop($('#divChatData')[0].scrollHeight);
 					}
 				}
 				// 입장

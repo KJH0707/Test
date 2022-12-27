@@ -5,10 +5,18 @@
     
 <mapper namespace="com.practice.myself.mapper">
 	<insert id="test">
-		insert into chat values(1,1,1,1,1)
+		insert into chat (id1,id2,bang_id,message,goods_no) values("ddd","dd123","dfsadfasd12d","ddd12","12")
 	</insert>
 	
 	<select id="getRoom" resultType="String">
-		select bang_id from chat where buyer_id=#{buyer_id} and seller_id=#{seller_id} limit 1
+		select bang_id from chat where (id1=#{id1} or id1=#{id2}) and (id2=#{id2} or id2=#{id1}) limit 1
 	</select>
+	
+	<select id="getRecord" resultType="String">
+		select message from chat where bang_id=#{bang_id}
+	</select>
+	
+	<insert id="recordMsg">
+		insert into chat (id1,id2,bang_id,message,goods_no) values(#{id1},#{id2},#{bang_id},#{message},#{goods_no})
+	</insert> 
 </mapper>

@@ -20,9 +20,10 @@ public class ChatController {
 	practiceService service;
 	
 	@GetMapping("/chat")
-	public void chat(Model model) {
-		String bang_id = service.getRoom();
-		
+	public void chat(Model model, ChatVO vo) {
+		vo.setId1("gd");
+		vo.setId2("sadf");
+		String bang_id = service.getRoom(vo);
 		if (bang_id==null) {
             for (int i = 0; i < 15; i++) {
                 char upperCh = (char)((int)(Math.random()*25) + 97);
