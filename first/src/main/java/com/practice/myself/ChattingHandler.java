@@ -33,14 +33,15 @@ public class ChattingHandler extends TextWebSocketHandler {
 		String id = (String)session.getAttributes().get("id");
 		
 		chatMap.put("buyId", id);
-		
+		chatMap.put("sellId", mapReceive.get("sellId"));
 		
 		switch (mapReceive.get("cmd")) {
 		
 		// CLIENT 입장
 		case "CMD_ENTER":
 			// 세션 리스트에 저장
-			chatMap.put("sellId", mapReceive.get("sellId"));
+			
+			
 			
 			Map<String, Object> map = new HashMap<String, Object>();
 			map.put("bang_id", mapReceive.get("bang_id"));
@@ -86,6 +87,7 @@ public class ChattingHandler extends TextWebSocketHandler {
 
 					String jsonStr = objectMapper.writeValueAsString(mapToSend);
 					sess.sendMessage(new TextMessage(jsonStr));
+					chatMap.put("msg", jsonStr);
 				}
 			}
 			break;
